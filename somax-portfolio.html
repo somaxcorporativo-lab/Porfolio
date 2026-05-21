@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOMAX — Sistemas de Crescimento Digital</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050810;
+    --bg2: #080d1a;
+    --surface: rgba(255,255,255,0.03);
+    --surface2: rgba(255,255,255,0.06);
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #f0f2ff;
+    --muted: rgba(240,242,255,0.5);
+    --accent: #3b7bff;
+    --accent2: #7c3aed;
+    --accent3: #06d6a0;
+    --gold: #f0b429;
+    --gradient: linear-gradient(135deg, #3b7bff 0%, #7c3aed 100%);
+    --gradient2: linear-gradient(135deg, #06d6a0 0%, #3b7bff 100%);
+    --glow: 0 0 60px rgba(59,123,255,0.18);
+    --font-display: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* NOISE TEXTURE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 20px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(5,8,16,0.7);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .nav-links { display: flex; gap: 36px; }
+  .nav-links a {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--text); }
+
+  .nav-cta {
+    background: var(--gradient);
+    color: #fff !important;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    transition: opacity 0.2s !important;
+  }
+  .nav-cta:hover { opacity: 0.85; }
+
+  /* SECTIONS */
+  section { position: relative; }
+
+  .container {
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  /* HERO */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding-top: 100px;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .hero-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.25;
+  }
+  .orb1 { width: 700px; height: 700px; background: #3b7bff; top: -200px; right: -200px; }
+  .orb2 { width: 500px; height: 500px; background: #7c3aed; bottom: -100px; left: -100px; }
+  .orb3 { width: 300px; height: 300px; background: #06d6a0; top: 30%; left: 40%; }
+
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(59,123,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59,123,255,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 780px;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(59,123,255,0.1);
+    border: 1px solid rgba(59,123,255,0.3);
+    padding: 8px 16px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: #7aadff;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+
+  .hero-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: #06d6a0;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(40px, 6vw, 76px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 28px;
+  }
+
+  .hero-title .highlight {
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 18px;
+    font-weight: 300;
+    color: var(--muted);
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: 48px;
+  }
+
+  .hero-btns {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--gradient);
+    color: #fff;
+    padding: 16px 32px;
+    border-radius: 10px;
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 30px rgba(59,123,255,0.35);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 40px rgba(59,123,255,0.5);
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    padding: 16px 32px;
+    border-radius: 10px;
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s, border-color 0.2s;
+    backdrop-filter: blur(10px);
+  }
+  .btn-secondary:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: var(--border2);
+  }
+
+  /* METRICS */
+  #metrics {
+    padding: 80px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+  }
+
+  .metric-card {
+    background: var(--bg);
+    padding: 48px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+
+  .metric-card:hover { background: var(--bg2); }
+
+  .metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 1px;
+    background: var(--gradient);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .metric-card:hover::before { opacity: 1; }
+
+  .metric-num {
+    font-family: var(--font-display);
+    font-size: 52px;
+    font-weight: 800;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+
+  .metric-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  /* SECTION HEADERS */
+  .section-label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+    padding: 6px 14px;
+    background: rgba(59,123,255,0.08);
+    border: 1px solid rgba(59,123,255,0.2);
+    border-radius: 4px;
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+
+  .section-sub {
+    font-size: 17px;
+    color: var(--muted);
+    max-width: 520px;
+    line-height: 1.65;
+  }
+
+  /* CASES */
+  #cases { padding: 120px 0; }
+
+  .cases-header {
+    margin-bottom: 80px;
+  }
+
+  /* CASE CARD */
+  .case-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 32px;
+    transition: border-color 0.3s, transform 0.3s;
+    position: relative;
+  }
+
+  .case-card:hover {
+    border-color: rgba(59,123,255,0.3);
+    transform: translateY(-4px);
+  }
+
+  .case-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--gradient);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .case-card:hover::before { opacity: 1; }
+
+  .case-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 420px;
+  }
+
+  .case-inner.reverse { direction: rtl; }
+  .case-inner.reverse > * { direction: ltr; }
+
+  .case-content {
+    padding: 56px 52px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .case-category {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent3);
+    margin-bottom: 20px;
+  }
+
+  .case-title {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 12px;
+  }
+
+  .case-subtitle {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 32px;
+  }
+
+  .case-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 36px;
+  }
+
+  .case-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    color: rgba(240,242,255,0.75);
+    line-height: 1.5;
+  }
+
+  .case-list li::before {
+    content: '✓';
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    background: rgba(6,214,160,0.12);
+    border: 1px solid rgba(6,214,160,0.3);
+    color: var(--accent3);
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 4px;
+    margin-top: 1px;
+  }
+
+  .case-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .tag {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 5px 12px;
+    border-radius: 100px;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    background: var(--surface2);
+  }
+
+  .case-visual {
+    background: var(--bg2);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 380px;
+  }
+
+  .case-visual img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top left;
+    opacity: 0.85;
+    transition: opacity 0.3s, transform 0.5s;
+  }
+
+  .case-card:hover .case-visual img {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+
+  .case-visual-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(5,8,16,0.3) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* GROWTH OPPORTUNITY BLOCK */
+  .growth-block {
+    background: linear-gradient(135deg, rgba(59,123,255,0.06) 0%, rgba(124,58,237,0.06) 100%);
+    border: 1px solid rgba(59,123,255,0.15);
+    border-radius: 14px;
+    padding: 28px 32px;
+    margin-top: 24px;
+  }
+
+  .growth-block-title {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #7aadff;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .growth-block-title::before {
+    content: '↗';
+    font-size: 16px;
+  }
+
+  .growth-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .growth-item {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 14px;
+    background: rgba(59,123,255,0.1);
+    border: 1px solid rgba(59,123,255,0.2);
+    border-radius: 100px;
+    color: #a0c4ff;
+  }
+
+  /* FULL WIDTH CASE */
+  .case-full {
+    padding: 64px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+
+  .case-full-info {}
+  .case-full-solution {}
+  .case-full-results {}
+
+  .case-full-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .case-full-title {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 16px;
+  }
+
+  .case-full-scenario {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .column-title {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+  }
+
+  /* WORKFLOW VISUAL */
+  .workflow-visual {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-top: 32px;
+    position: relative;
+  }
+
+  .workflow-header {
+    background: var(--surface2);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot-red { background: #ff5f57; }
+  .dot-yellow { background: #febc2e; }
+  .dot-green { background: #28c840; }
+
+  .workflow-url {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 11px;
+    color: var(--muted);
+    margin-left: 8px;
+  }
+
+  /* TECH STACK */
+  #stack { padding: 100px 0; border-top: 1px solid var(--border); }
+
+  .stack-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 16px;
+    margin-top: 60px;
+  }
+
+  .stack-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 16px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    transition: all 0.25s;
+    cursor: default;
+  }
+
+  .stack-item:hover {
+    background: var(--surface2);
+    border-color: rgba(59,123,255,0.3);
+    color: var(--text);
+    transform: translateY(-2px);
+  }
+
+  .stack-icon {
+    font-size: 28px;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  /* DIFFERENTIALS */
+  #diff { padding: 100px 0; }
+
+  .diff-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 64px;
+  }
+
+  .diff-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .diff-card.featured {
+    background: linear-gradient(135deg, rgba(59,123,255,0.08) 0%, rgba(124,58,237,0.08) 100%);
+    border-color: rgba(59,123,255,0.25);
+  }
+
+  .diff-card.featured::before {
+    content: 'SOMAX';
+    position: absolute;
+    top: 20px; right: 20px;
+    font-family: var(--font-display);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .diff-badge {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-bottom: 24px;
+    display: inline-block;
+  }
+
+  .diff-badge.common {
+    background: rgba(255,255,255,0.05);
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+
+  .diff-badge.premium {
+    background: rgba(59,123,255,0.12);
+    color: #7aadff;
+    border: 1px solid rgba(59,123,255,0.25);
+  }
+
+  .diff-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 24px;
+  }
+
+  .diff-items { display: flex; flex-direction: column; gap: 14px; }
+
+  .diff-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+  }
+
+  .diff-icon-no {
+    width: 22px; height: 22px;
+    background: rgba(255,80,80,0.1);
+    border: 1px solid rgba(255,80,80,0.2);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: #ff6b6b; min-width: 22px;
+  }
+
+  .diff-icon-yes {
+    width: 22px; height: 22px;
+    background: rgba(6,214,160,0.1);
+    border: 1px solid rgba(6,214,160,0.25);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: var(--accent3); min-width: 22px;
+  }
+
+  /* CTA */
+  #cta {
+    padding: 140px 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #cta::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 800px; height: 600px;
+    background: radial-gradient(ellipse, rgba(59,123,255,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cta-inner { position: relative; z-index: 2; }
+
+  .cta-title {
+    font-family: var(--font-display);
+    font-size: clamp(32px, 5vw, 62px);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    max-width: 700px;
+    margin: 0 auto 28px;
+  }
+
+  .cta-sub {
+    font-size: 18px;
+    color: var(--muted);
+    margin-bottom: 52px;
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 48px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .footer-logo {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .footer-text {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* SCROLL REVEAL */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border2) 30%, var(--border2) 70%, transparent);
+    margin: 0;
+  }
+
+  /* CASE NUMBER */
+  .case-num {
+    position: absolute;
+    top: 28px; right: 32px;
+    font-family: var(--font-display);
+    font-size: 80px;
+    font-weight: 800;
+    color: rgba(255,255,255,0.025);
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  /* CONTACT ROW */
+  .contact-row {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+
+  .contact-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .contact-item strong { color: var(--text); font-weight: 600; }
+
+  /* RATING BADGE */
+  .rating-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(240,180,41,0.1);
+    border: 1px solid rgba(240,180,41,0.25);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 24px;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    .container { padding: 0 24px; }
+    .case-inner { grid-template-columns: 1fr; }
+    .case-inner.reverse { direction: ltr; }
+    .case-visual { min-height: 240px; }
+    .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+    .stack-grid { grid-template-columns: repeat(3, 1fr); }
+    .diff-grid { grid-template-columns: 1fr; }
+    .case-full { grid-template-columns: 1fr; padding: 40px 28px; }
+    footer { flex-direction: column; gap: 16px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">SOMAX</div>
+  <div class="nav-links">
+    <a href="#cases">Cases</a>
+    <a href="#stack">Stack</a>
+    <a href="#diff">Diferenciais</a>
+    <a href="https://wa.me/5561993711970" target="_blank" class="nav-cta">Falar com Especialista</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg">
+    <div class="hero-grid"></div>
+    <div class="hero-orb orb1"></div>
+    <div class="hero-orb orb2"></div>
+    <div class="hero-orb orb3"></div>
+  </div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-badge reveal">Sistemas de Crescimento Digital</div>
+      <h1 class="hero-title reveal reveal-delay-1">
+        Transformamos marketing em <span class="highlight">sistemas previsíveis</span> de crescimento.
+      </h1>
+      <p class="hero-sub reveal reveal-delay-2">
+        Através de SEO, tráfego pago, automações, CRM e tecnologia, ajudamos empresas a gerar mais oportunidades e aumentar sua eficiência operacional.
+      </p>
+      <div class="hero-btns reveal reveal-delay-3">
+        <a href="#cases" class="btn-primary">Ver Cases →</a>
+        <a href="https://wa.me/5561993711970" target="_blank" class="btn-secondary">Falar com Especialista</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- METRICS -->
+<section id="metrics">
+  <div class="metrics-grid">
+    <div class="metric-card reveal">
+      <div class="metric-num">+50</div>
+      <div class="metric-label">Projetos Entregues</div>
+    </div>
+    <div class="metric-card reveal reveal-delay-1">
+      <div class="metric-num">+100k</div>
+      <div class="metric-label">Leads Impactados</div>
+    </div>
+    <div class="metric-card reveal reveal-delay-2">
+      <div class="metric-num">+7</div>
+      <div class="metric-label">Cases Documentados</div>
+    </div>
+    <div class="metric-card reveal reveal-delay-3">
+      <div class="metric-num">∞</div>
+      <div class="metric-label">Segmentos Atendidos</div>
+    </div>
+  </div>
+</section>
+
+<!-- CASES -->
+<section id="cases">
+  <div class="container">
+    <div class="cases-header reveal">
+      <div class="section-label">Cases Reais</div>
+      <h2 class="section-title">Resultados que falam por si.</h2>
+      <p class="section-sub">Cada projeto é uma prova do que é possível quando estratégia, tecnologia e execução andam juntas.</p>
+    </div>
+
+    <!-- CASE 01 – Du Conde -->
+    <div class="case-card reveal">
+      <span class="case-num">01</span>
+      <div class="case-inner">
+        <div class="case-content">
+          <div class="case-category">Google Meu Negócio · SEO Local · Valparaíso de Goiás</div>
+          <h3 class="case-title">Du Conde Le Gourmet – Pastelaria</h3>
+          <div class="contact-row">
+            <div class="contact-item"><strong>Proprietário:</strong> Conde</div>
+            <div class="contact-item"><strong>Contato:</strong> (61) 99371-1970</div>
+          </div>
+          <div class="rating-badge">⭐ 5,0 · 85 avaliações · R$ 20–40</div>
+          <ul class="case-list">
+            <li>Estruturação completa do Google Meu Negócio</li>
+            <li>Otimizações de perfil para pesquisas locais</li>
+            <li>Estratégias de visibilidade na região</li>
+            <li>Posicionamento como referência em pastelaria</li>
+          </ul>
+          <div class="case-tags">
+            <span class="tag">Google Meu Negócio</span>
+            <span class="tag">SEO Local</span>
+            <span class="tag">Presença Digital</span>
+          </div>
+        </div>
+        <div class="case-visual">
+          <img src="duconde.png" alt="Du Conde Le Gourmet no Google Maps">
+          <div class="case-visual-overlay"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CASE 02 – CCAA -->
+    <div class="case-card reveal">
+      <span class="case-num">02</span>
+      <div class="case-inner reverse">
+        <div class="case-content">
+          <div class="case-category">SEO Local · Google Ads · Captação de Alunos</div>
+          <h3 class="case-title">CCAA Valparaíso de Goiás</h3>
+          <div class="contact-row">
+            <div class="contact-item"><strong>Diretora:</strong> Rozirene</div>
+            <div class="contact-item"><strong>Contato:</strong> (61) 99824-2389</div>
+          </div>
+          <div class="rating-badge">⭐ 4,8 ·</div>
+          <ul class="case-list">
+            <li>SEO Local com foco em "escola de idiomas"</li>
+            <li>Estruturação Google Meu Negócio</li>
+            <li>Campanhas Google Ads para captação</li>
+            <li>Fortalecimento de marca regional</li>
+            <li>Crescimento de oportunidades de matrícula</li>
+          </ul>
+          <div class="case-tags">
+            <span class="tag">Google Ads</span>
+            <span class="tag">SEO Local</span>
+            <span class="tag">Captação</span>
+            <span class="tag">Educação</span>
+          </div>
+        </div>
+        <div class="case-visual">
+          <img src="CCAA.png" alt="CCAA Valparaíso de Goiás no Google Maps">
+          <div class="case-visual-overlay"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CASE 03 – Delícias no Ponto -->
+    <div class="case-card reveal">
+      <span class="case-num">03</span>
+      <div class="case-inner">
+        <div class="case-content">
+          <div class="case-category">Google Meu Negócio · Confeitaria · Expansão Potencial</div>
+          <h3 class="case-title">Delícias no Ponto</h3>
+          <div class="contact-row">
+            <div class="contact-item"><strong>Proprietário:</strong> Wanderson</div>
+            <div class="contact-item"><strong>Contato:</strong> (61) 99176-7477</div>
+          </div>
+          <div class="rating-badge">⭐ 4,7 </div>
+          <ul class="case-list">
+            <li>Cadastro e configuração Google Meu Negócio</li>
+            <li>Indexação completa no Google</li>
+            <li>Estruturação das informações comerciais</li>
+            <li>Canal aberto para aquisição orgânica</li>
+          </ul>
+          <div class="growth-block">
+            <div class="growth-block-title">Próximos Passos de Escala</div>
+            <div class="growth-items">
+              <span class="growth-item">SEO Local Avançado</span>
+              <span class="growth-item">Gestão de Avaliações</span>
+              <span class="growth-item">Produção de Conteúdo</span>
+              <span class="growth-item">Google Ads</span>
+              <span class="growth-item">Landing Pages</span>
+              <span class="growth-item">Keywords Strategy</span>
+            </div>
+          </div>
+        </div>
+        <div class="case-visual">
+          <img src="restaurante.png" alt="Delícias no Ponto no Google">
+          <div class="case-visual-overlay"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CASE 04 – Chef Catarina -->
+    <div class="case-card reveal">
+      <span class="case-num">04</span>
+      <div class="case-inner reverse">
+        <div class="case-content">
+          <div class="case-category">Google Meu Negócio · Restaurante · Oportunidades Digitais</div>
+          <h3 class="case-title">Chef Catarina – Marmitaria e Restaurante</h3>
+          <div class="contact-row">
+            <div class="contact-item"><strong>Proprietária:</strong> Catarina</div>
+            <div class="contact-item"><strong>Contato:</strong> (61) 98724-4389</div>
+          </div>
+          <ul class="case-list">
+            <li>Cadastro e configuração Google Meu Negócio</li>
+            <li>Empresa indexada nas pesquisas regionais</li>
+            <li>Presença digital estabelecida</li>
+          </ul>
+          <div class="growth-block">
+            <div class="growth-block-title">Próximos Passos de Escala</div>
+            <div class="growth-items">
+              <span class="growth-item">SEO Local</span>
+              <span class="growth-item">Google Ads</span>
+              <span class="growth-item">Cardápio Digital</span>
+              <span class="growth-item">Landing Page</span>
+              <span class="growth-item">Automação WhatsApp</span>
+              <span class="growth-item">Fidelização</span>
+            </div>
+          </div>
+        </div>
+        <div class="case-visual" style="background: linear-gradient(135deg, #0d1225 0%, #111827 100%); display:flex; align-items:center; justify-content:center;">
+          <div style="text-align:center; padding: 40px;">
+            <div style="font-size:64px; margin-bottom:16px;">🍱</div>
+            <div style="font-family:var(--font-display); font-size:20px; font-weight:700; margin-bottom:8px;">Chef Catarina</div>
+            <div style="font-size:13px; color:var(--muted);">Marmitaria & Restaurante</div>
+            <div style="margin-top:20px; display:inline-flex; align-items:center; gap:6px; background:rgba(6,214,160,0.1); border:1px solid rgba(6,214,160,0.25); border-radius:8px; padding:8px 16px; font-size:13px; color:var(--accent3);">
+              ✓ Presente no Google
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CASE 05 – 11ze Engenharia -->
+    <div class="case-card reveal">
+      <span class="case-num">05</span>
+      <div class="case-full">
+        <div class="case-full-info">
+          <div class="case-full-label">Automação Empresarial</div>
+          <h3 class="case-full-title">11ze Engenharia</h3>
+          <p class="case-full-scenario">Processos manuais gerando retrabalho e perda de produtividade. A equipe desperdiçava horas em tarefas repetitivas que poderiam ser automatizadas.</p>
+        </div>
+        <div class="case-full-solution">
+          <div class="column-title">Solução Implementada</div>
+          <ul class="case-list">
+            <li>Mapeamento e automação de fluxos operacionais</li>
+            <li>Integrações entre sistemas</li>
+            <li>Eliminação de retrabalho manual</li>
+            <li>Processos padronizados e escaláveis</li>
+          </ul>
+        </div>
+        <div class="case-full-results">
+          <div class="column-title">Resultados</div>
+          <ul class="case-list">
+            <li>Redução drástica de tarefas manuais</li>
+            <li>Maior eficiência operacional</li>
+            <li>Escalabilidade dos processos internos</li>
+            <li>Equipe focada em atividades estratégicas</li>
+          </ul>
+          <div class="case-tags" style="margin-top:20px">
+            <span class="tag">N8N</span>
+            <span class="tag">Automação</span>
+            <span class="tag">Integração</span>
+            <span class="tag">Engenharia</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CASE 06 – Hospital de Olhos (CRM) -->
+    <div class="case-card reveal">
+      <span class="case-num">06</span>
+      <div class="case-inner">
+        <div class="case-content">
+          <div class="case-category">CRM Personalizado · Gestão Comercial · Saúde</div>
+          <h3 class="case-title">Hospital de Olhos</h3>
+          <p class="case-subtitle">CRM desenvolvido sob medida para centralizar o atendimento e relacionamento com pacientes.</p>
+          <ul class="case-list">
+            <li>CRM personalizado com dashboard executivo</li>
+            <li>Pipeline de leads com temperatura (emergência, quentes, mornos, frios)</li>
+            <li>Gestão centralizada de pacientes</li>
+            <li>Controle operacional completo</li>
+            <li>Pipeline ponderado e métricas de conversão</li>
+          </ul>
+          <div class="case-tags">
+            <span class="tag">CRM</span>
+            <span class="tag">Dashboard</span>
+            <span class="tag">Saúde</span>
+            <span class="tag">IA</span>
+          </div>
+        </div>
+        <div class="case-visual">
+          <img src="CRM.png" alt=" CRM – Synthetica">
+          <div class="case-visual-overlay"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CASE 07 – Suprema Viagens (N8N) -->
+    <div class="case-card reveal">
+      <span class="case-num">07</span>
+      <div class="case-inner reverse">
+        <div class="case-content">
+          <div class="case-category">Automação Financeira · N8N · Workflow</div>
+          <h3 class="case-title">Suprema Viagens</h3>
+          <p class="case-subtitle">Necessidade de automatizar cobranças, pagamentos e integrações financeiras, eliminando operações manuais repetitivas.</p>
+          <ul class="case-list">
+            <li>Workflow completo no N8N para pagamentos</li>
+            <li>Automação de cobranças recorrentes</li>
+            <li>Integração entre sistemas financeiros</li>
+            <li>Regras automatizadas e notificações</li>
+            <li>Controle financeiro centralizado</li>
+          </ul>
+          <div class="case-tags">
+            <span class="tag">N8N</span>
+            <span class="tag">Automação Financeira</span>
+            <span class="tag">Integrações</span>
+            <span class="tag">Viagens</span>
+          </div>
+        </div>
+        <div class="case-visual">
+          <img src="Suprema viagens.png" alt="Workflow N8N – Suprema Viagens">
+          <div class="case-visual-overlay"></div>
+        </div>
+      </div>
+      <!-- Workflow Technical Explainer -->
+      <div style="padding: 0 52px 52px;">
+        <div class="workflow-visual">
+          <div class="workflow-header">
+            <div class="dot dot-red"></div>
+            <div class="dot dot-yellow"></div>
+            <div class="dot dot-green"></div>
+            <div class="workflow-url">localhost:5678/workflow/pagamento-suprema</div>
+          </div>
+          <div style="padding: 32px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; align-items: center;">
+            <div style="text-align:center">
+              <div style="background:rgba(59,123,255,0.12); border:1px solid rgba(59,123,255,0.25); border-radius:10px; padding:16px 12px; font-size:12px; font-weight:600; color:#7aadff;">Webhook / Trigger</div>
+              <div style="font-size:10px; color:var(--muted); margin-top:8px;">Entrada de dados</div>
+            </div>
+            <div style="text-align:center; color:var(--muted); font-size:20px;">→</div>
+            <div style="text-align:center">
+              <div style="background:rgba(240,180,41,0.1); border:1px solid rgba(240,180,41,0.25); border-radius:10px; padding:16px 12px; font-size:12px; font-weight:600; color:var(--gold);">Regras & Condições</div>
+              <div style="font-size:10px; color:var(--muted); margin-top:8px;">Lógica de negócio</div>
+            </div>
+            <div style="text-align:center; color:var(--muted); font-size:20px;">→</div>
+            <div style="text-align:center">
+              <div style="background:rgba(6,214,160,0.1); border:1px solid rgba(6,214,160,0.25); border-radius:10px; padding:16px 12px; font-size:12px; font-weight:600; color:var(--accent3);">Notificação + Ação</div>
+              <div style="font-size:10px; color:var(--muted); margin-top:8px;">Resultado automatizado</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CASE BONUS – Web Development -->
+    <div class="case-card reveal">
+      <span class="case-num">+</span>
+      <div class="case-inner">
+        <div class="case-content">
+          <div class="case-category">Desenvolvimento Web · Landing Page · Construtora</div>
+          <h3 class="case-title">Henrique Santos Construtora</h3>
+          <p class="case-subtitle">Site institucional premium desenvolvido para captar investidores e compradores de imóveis modernos.</p>
+          <ul class="case-list">
+            <li>Landing page de alto impacto visual</li>
+            <li>Copywriting orientado à conversão</li>
+            <li>Design responsivo e mobile-first</li>
+            <li>Integração com WhatsApp para leads</li>
+          </ul>
+          <div class="case-tags">
+            <span class="tag">Web Dev</span>
+            <span class="tag">Landing Page</span>
+            <span class="tag">Conversão</span>
+            <span class="tag">Imóveis</span>
+          </div>
+        </div>
+        <div class="case-visual">
+          <img src="site.png" alt="Henrique Santos Construtora – Site">
+          <div class="case-visual-overlay"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- DIFFERENTIALS -->
+<section id="diff">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Diferenciais</div>
+      <h2 class="section-title">Por que a SOMAX?</h2>
+      <p class="section-sub">Não somos uma agência comum. Construímos sistemas completos de aquisição, conversão e escala.</p>
+    </div>
+
+    <div class="diff-grid">
+      <div class="diff-card reveal">
+        <div class="diff-badge common">Freelancer Comum</div>
+        <h3 class="diff-title" style="color:var(--muted)">Execução Pontual</h3>
+        <div class="diff-items">
+          <div class="diff-item"><div class="diff-icon-no">✗</div> Executa tarefas isoladas</div>
+          <div class="diff-item"><div class="diff-icon-no">✗</div> Sem visão estratégica</div>
+          <div class="diff-item"><div class="diff-icon-no">✗</div> Sem integração entre canais</div>
+          <div class="diff-item"><div class="diff-icon-no">✗</div> Sem automações ou CRM</div>
+          <div class="diff-item"><div class="diff-icon-no">✗</div> Sem mensuração de resultados</div>
+          <div class="diff-item"><div class="diff-icon-no">✗</div> Sem escalabilidade</div>
+        </div>
+      </div>
+
+      <div class="diff-card featured reveal reveal-delay-2">
+        <div class="diff-badge premium">SOMAX</div>
+        <h3 class="diff-title">Ecossistema de Crescimento</h3>
+        <div class="diff-items">
+          <div class="diff-item"><div class="diff-icon-yes">✓</div> Estratégia integrada 360°</div>
+          <div class="diff-item"><div class="diff-icon-yes">✓</div> SEO + Tráfego pago orquestrados</div>
+          <div class="diff-item"><div class="diff-icon-yes">✓</div> Automações N8N e IA</div>
+          <div class="diff-item"><div class="diff-icon-yes">✓</div> CRM e gestão comercial</div>
+          <div class="diff-item"><div class="diff-icon-yes">✓</div> Desenvolvimento web focado em conversão</div>
+          <div class="diff-item"><div class="diff-icon-yes">✓</div> Sistemas escaláveis e mensuráveis</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- STACK -->
+<section id="stack">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Stack Tecnológico</div>
+      <h2 class="section-title">Ferramentas de ponta,<br>resultados reais.</h2>
+    </div>
+    <div class="stack-grid">
+      <div class="stack-item reveal"><span class="stack-icon">🔍</span>Google Ads</div>
+      <div class="stack-item reveal reveal-delay-1"><span class="stack-icon">📘</span>Meta Ads</div>
+      <div class="stack-item reveal reveal-delay-2"><span class="stack-icon">📊</span>Analytics</div>
+      <div class="stack-item reveal reveal-delay-3"><span class="stack-icon">🗺️</span>Google Meu Negócio</div>
+      <div class="stack-item reveal"><span class="stack-icon">🔎</span>Search Console</div>
+      <div class="stack-item reveal reveal-delay-1"><span class="stack-icon">⚡</span>N8N</div>
+      <div class="stack-item reveal reveal-delay-2"><span class="stack-icon">🤖</span>OpenAI / IA</div>
+      <div class="stack-item reveal reveal-delay-3"><span class="stack-icon">🌐</span>WordPress</div>
+      <div class="stack-item reveal"><span class="stack-icon">🎨</span>Elementor</div>
+      <div class="stack-item reveal reveal-delay-1"><span class="stack-icon">🛒</span>WooCommerce</div>
+      <div class="stack-item reveal reveal-delay-2"><span class="stack-icon">🔗</span>APIs & CRM</div>
+      <div class="stack-item reveal reveal-delay-3"><span class="stack-icon">📈</span>SEO Avançado</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <div class="container">
+    <div class="cta-inner reveal">
+      <div class="section-label" style="margin: 0 auto 24px; display:block; text-align:center; width:fit-content;">Próximo Passo</div>
+      <h2 class="cta-title">Seu próximo resultado pode ser o próximo case da SOMAX.</h2>
+      <p class="cta-sub">Diagnóstico estratégico gratuito. Sem compromisso.</p>
+      <a href="https://wa.me/5561993711970" target="_blank" class="btn-primary" style="font-size:16px; padding:20px 44px;">
+        Solicitar Diagnóstico Estratégico →
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">SOMAX</div>
+  <div class="footer-text">Sistemas de Aquisição, Conversão e Escala · Valparaíso de Goiás, GO</div>
+  <div class="footer-text">© 2025 SOMAX</div>
+</footer>
+
+<script>
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  // Nav scroll effect
+  const nav = document.querySelector('nav');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 60) {
+      nav.style.borderBottomColor = 'rgba(255,255,255,0.12)';
+    } else {
+      nav.style.borderBottomColor = 'rgba(255,255,255,0.08)';
+    }
+  });
+
+  // Counter animation
+  const counters = document.querySelectorAll('.metric-num');
+  const counterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.animation = 'countIn 0.6s ease forwards';
+      }
+    });
+  }, { threshold: 0.5 });
+  counters.forEach(el => counterObserver.observe(el));
+</script>
+
+<style>
+@keyframes countIn {
+  from { opacity: 0; transform: scale(0.8) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+</style>
+
+</body>
+</html>
